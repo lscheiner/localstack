@@ -3,6 +3,7 @@ version: "3.8"
 services:
   localstack:
     image: localstack/localstack:latest
+    container_name: localstack
     ports:
       - "4566:4566"
     environment:
@@ -14,4 +15,46 @@ services:
       - "./lambda:/opt/lambda"
       - "./dynamodb:/opt/dynamodb"
       - "./sqs:/opt/sqs"
-      - "./sns:/opt/sns"                
+      - "./sns:/opt/sns"
+    networks:
+      - app-network
+
+  wiremock:
+    image: wiremock/wiremock:3.13.2
+    container_name: wiremock
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+      - ./wiremock/files:/home/wiremock/__files
+    environment:
+      - JAVA_OPTS=-Xmx512m
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  redis-init-data:
+    image: redis:7.2-alpine
+    depends_on:
+      - redis
+    entrypoint: >
+      sh -c "
+        echo 'Aguardando Redis...';
+        until redis-cli -h redis ping; do sleep 0.5; done;
+        echo 'Inserindo valor...';
+        redis-cli -h redis SET teste_ff0ddb1f-f91e-4d4a-9555-ccabd86e8da6 10000;
+        echo 'Valor inserido!';
+      "
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
