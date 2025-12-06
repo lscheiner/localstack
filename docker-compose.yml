@@ -12,10 +12,11 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./localstack/init:/etc/localstack/init"
-      - "./lambda:/opt/lambda"
-      - "./dynamodb:/opt/dynamodb"
-      - "./sqs:/opt/sqs"
-      - "./sns:/opt/sns"
+      - "./localstack-config/lambda:/opt/lambda"
+      - "./localstack-config/dynamodb:/opt/dynamodb"
+      - "./localstack-config/sqs:/opt/sqs"
+      - "./localstack-config/sns:/opt/sns"
+
     networks:
       - app-network
 
