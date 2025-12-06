@@ -1,0 +1,9 @@
+{
+  "TopicArn": "arn:aws:sns:us-east-1:000000000000:pedidoAtualizado",
+  "Protocol": "sqs",
+  "Endpoint": "arn:aws:sqs:us-east-1:000000000000:fila-pedidos",
+  "Attributes": {
+    "FilterPolicy": "{\"customerId\": [99]}",
+    "FilterPolicyScope":"MessageBody"
+  }
+}
