@@ -3,10 +3,11 @@
   "Runtime": "python3.12",
   "Role": "arn:aws:iam::000000000000:role/lambda-role",
   "Handler": "handler.lambda_handler",
+  "Timeout": 60,
   "Environment": {
     "Variables": {
-      "API_URL": "http://mock",
-      "CUSTOMER_ID": "999"
+        "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:pedidoAtualizado",
+        "AWS_ENDPOINT_URL": "http://localstack:4566"
     }
   }
 }

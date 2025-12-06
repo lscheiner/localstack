@@ -1,37 +1,54 @@
 import os
 import json
+import boto3
+from decimal import Decimal
+from boto3.dynamodb.types import TypeDeserializer
+
+deserializer = TypeDeserializer()
+
+endpoint_url = os.environ.get("AWS_ENDPOINT_URL", "http://localhost:4566")
+sns_client = boto3.client("sns", endpoint_url=endpoint_url)
+
+def convert_decimals(obj):
+    if isinstance(obj, list):
+        return [convert_decimals(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: convert_decimals(v) for k, v in obj.items()}
+    elif isinstance(obj, Decimal):
+        if obj % 1 == 0:
+            return int(obj)
+        else:
+            return float(obj)
+    else:
+        return obj
 
 def lambda_handler(event, context):
-    print("\n=== EVENTO DO DYNAMODB STREAM ===")
+    topic_arn = os.environ.get("SNS_TOPIC_ARN")
+    if not topic_arn:
+        print("Variável de ambiente SNS_TOPIC_ARN não definida!")
+        return {"status": "error", "message": "SNS_TOPIC_ARN missing"}
 
-    # Imprime JSON formatado
-    print("Event (formatado) =>")
-    print(json.dumps(event, indent=2, ensure_ascii=False))
+    for record in event.get("Records", []):
+        new_image = record.get("dynamodb", {}).get("NewImage")
+        if new_image:
 
-    # Captura variáveis de ambiente reais
-    env_vars = dict(os.environ)
+            item = {k: deserializer.deserialize(v) for k, v in new_image.items()}
+            item = convert_decimals(item)
 
-    # Extrai variáveis mencionadas no JSON
-    # (qualquer chave top-level do evento que também exista como env var)
-    keys_do_evento = []
+            json_payload = json.dumps(item, indent=2)
+            print("Novo pedido do DynamoDB Stream:")
+            print(json_payload)
 
-    if isinstance(event, dict):
-        keys_do_evento = list(event.keys())
+            response = sns_client.publish(
+                TopicArn=topic_arn,
+                Message=json_payload,
+                MessageAttributes={
+                    "customerId": {
+                        "DataType": "Number",
+                        "StringValue": str(item.get("customerId", "0").replace("CUST-", ""))
+                    }
+                }
+            )
+            print(f"Publicado no SNS: {response['MessageId']}")
 
-    env_vars_usadas = {
-        k: env_vars[k]
-        if k in env_vars else "(não existe nas variáveis de ambiente)"
-        for k in keys_do_evento
-    }
-
-    print("\n=== VARIÁVEIS MENCIONADAS NO EVENTO ===")
-    print(json.dumps(env_vars_usadas, indent=2, ensure_ascii=False))
-
-    print("\n=== TODAS AS ENV VARS ===")
-    print(json.dumps(env_vars, indent=2, ensure_ascii=False))
-
-    return {
-        "status": "ok",
-        "env_vars_mencionadas": env_vars_usadas,
-        "env_vars_todas": env_vars
-    }
+    return {"status": "ok"}

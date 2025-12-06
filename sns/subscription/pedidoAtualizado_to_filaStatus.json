@@ -3,7 +3,7 @@
   "Protocol": "sqs",
   "Endpoint": "arn:aws:sqs:us-east-1:000000000000:fila-pedidos",
   "Attributes": {
-    "FilterPolicy": "{\"customerId\": [99]}",
+    "FilterPolicy": "{\"customerId\": [\"99\"]}",
     "FilterPolicyScope":"MessageBody"
   }
 }
