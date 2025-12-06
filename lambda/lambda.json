@@ -1,0 +1,12 @@
+{
+  "FunctionName": "lambda-processor",
+  "Runtime": "python3.12",
+  "Role": "arn:aws:iam::000000000000:role/lambda-role",
+  "Handler": "handler.lambda_handler",
+  "Environment": {
+    "Variables": {
+      "API_URL": "http://mock",
+      "CUSTOMER_ID": "999"
+    }
+  }
+}

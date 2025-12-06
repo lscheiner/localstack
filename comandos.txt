@@ -1,0 +1,18 @@
+awslocal dynamodb put-item \
+  --table-name Orders \
+  --item '{
+    "orderId": {"S": "ORD-002"},
+    "customerId": {"S": "CUST-99"},
+    "status": {"S": "CREATED"},
+    "amount": {"N": "45.70"},
+    "createdAt": {"S": "2025-12-05T21:00:00Z"}
+  }'
+
+
+awslocal sns publish \
+  --topic-arn arn:aws:sns:us-east-1:000000000000:pedidoAtualizado \
+  --message '{"customerId": 99, "orderId": "ABC-123", "status": "APROVADO"}'
+
+
+awslocal sqs receive-message \
+  --queue-url http://localhost:4566/000000000000/fila-pedidos

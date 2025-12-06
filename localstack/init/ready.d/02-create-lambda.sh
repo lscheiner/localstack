@@ -1,39 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "[LocalStack] Empacotando lambda..."
+LAMBDA_DIR="/opt/lambda"
+LAMBDA_JSON="$LAMBDA_DIR/lambda.json"
+ZIP_FILE="/tmp/lambda.zip"
 
-mkdir -p /tmp
+echo "[Lambda] Empacotando handler..."
+zip -j "$ZIP_FILE" "$LAMBDA_DIR/handler.py"
 
-zip -j /tmp/lambda.zip /opt/lambda/handler.py
+echo "[Lambda] Criando função usando JSON + zip-file..."
 
-NAME="lambda-processor"
-ENV_FILE="/opt/lambda/env.json"
-LAMBDA_ENV=""
+awslocal lambda create-function \
+  --cli-input-json file://"$LAMBDA_JSON" \
+  --zip-file fileb://"$ZIP_FILE"
 
-if [ -f "$ENV_FILE" ]; then
-  echo "[LocalStack] Carregando variáveis de ambiente do env.json..."
-
-  ENV_VARS=$(python3 - <<EOF
-import json
-with open("$ENV_FILE") as f:
-    print(json.dumps({"Variables": json.load(f)}))
-EOF
-  )
-
-  LAMBDA_ENV="--environment '$ENV_VARS'"
-else
-  echo "[LocalStack] Nenhum env.json encontrado. Lambda será criada sem environment."
-fi
-
-echo "[LocalStack] Criando Lambda..."
-
-eval awslocal lambda create-function \
-  --function-name $NAME \
-  --runtime python3.12 \
-  --handler handler.lambda_handler \
-  --zip-file fileb:///tmp/lambda.zip \
-  --role arn:aws:iam::000000000000:role/lambda-role \
-  $LAMBDA_ENV
-
-echo "[LocalStack] Lambda criada com sucesso!"
+echo "[Lambda] Função criada com sucesso!"
