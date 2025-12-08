@@ -9,14 +9,11 @@ services:
     environment:
       - SERVICES=lambda,dynamodb,dynamodbstreams,iam,logs,sns,sqs
       - DEBUG=1
+      - LOCALSTACK_HOSTNAME=localstack
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./localstack/init:/etc/localstack/init"
-      - "./localstack-config/lambda:/opt/lambda"
-      - "./localstack-config/dynamodb:/opt/dynamodb"
-      - "./localstack-config/sqs:/opt/sqs"
-      - "./localstack-config/sns:/opt/sns"
-
+      - "./localstack-config/:/opt/custom"
     networks:
       - app-network
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-LAMBDA_DIR="/opt/lambda"
+LAMBDA_DIR="/opt/custom/lambda"
 LAMBDA_JSON="$LAMBDA_DIR/lambda.json"
 ZIP_FILE="/tmp/lambda.zip"
 

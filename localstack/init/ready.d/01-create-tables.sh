@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DDB_DIR="/opt/dynamodb"
+DDB_DIR="/opt/custom/dynamodb"
 
 echo "[LocalStack] Criando tabelas DynamoDB..."
 

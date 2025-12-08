@@ -6,7 +6,7 @@ echo "===================================================="
 echo "[LocalStack] Criando filas SQS a partir de arquivos JSON..."
 echo "===================================================="
 
-SQS_DIR="/opt/sqs"
+SQS_DIR="/opt/custom/sqs"
 
 if [ ! -d "$SQS_DIR" ]; then
   echo "[LocalStack] Pasta /opt/sqs não encontrada — nenhuma fila será criada."

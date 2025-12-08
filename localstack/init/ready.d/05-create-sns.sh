@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-SNS_DIR="/opt/sns"
+SNS_DIR="/opt/custom/sns"
 TOPIC_DIR="$SNS_DIR/topic"
 SUB_DIR="$SNS_DIR/subscription"
 
