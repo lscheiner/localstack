@@ -35,21 +35,10 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    networks:
-      - app-network
-
-  redis-init-data:
-    image: redis:7.2-alpine
-    depends_on:
-      - redis
-    entrypoint: >
-      sh -c "
-        echo 'Aguardando Redis...';
-        until redis-cli -h redis ping; do sleep 0.5; done;
-        echo 'Inserindo valor...';
-        redis-cli -h redis SET teste_ff0ddb1f-f91e-4d4a-9555-ccabd86e8da6 10000;
-        echo 'Valor inserido!';
-      "
+    volumes:
+      - ./redis/redis-entrypoint.sh:/usr/local/bin/redis-entrypoint.sh
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    entrypoint: ["/usr/local/bin/redis-entrypoint.sh"]
     networks:
       - app-network
 
